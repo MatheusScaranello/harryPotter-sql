@@ -18,7 +18,7 @@ app.get("/", async (req, res) => {
     res.status(200).send({ mensagem: "Servidor backend rodando com sucesso🚀" });
 });
 
-app.get("/wizart", async (req, res) => {
+app.get("/wizard", async (req, res) => {
     try {
         const { rows } = await pool.query("SELECT * FROM wizard");
         res.status(200).send({
@@ -33,11 +33,12 @@ app.get("/wizart", async (req, res) => {
 });
 
 app.post("/wizard", async (req, res) => {
-    const { name, age, special_ability, patronus, wand_id } = req.body;
-    const house = verificaHouse(req.body.house);
-    const blood_status = verificaBloodStatus(req.body.blood_status);
+    const { name, age, house, special_ability, blood_status, patronus, wand_id } = req.body;
   
     try {
+        const house = verificaHouse(req.body.house);
+        const blood_status = verificaBloodStatus(req.body.blood_status);
+
       const result = await pool.query(
         'INSERT INTO wizard (name, age, house, special_ability, blood_status, patronus, wand_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
         [name, age, house, special_ability, blood_status, patronus, wand_id]
@@ -53,9 +54,12 @@ app.post("/wizard", async (req, res) => {
     }
   });
 
+
 app.put("/wizard/:id", async (req, res) => {
         const { id } = req.params;
-        const { name, age, house, special_ability, blood_status, patronus, wand_id } = req.body;
+        const { name, age, special_ability, patronus, wand_id } = req.body;
+        const house = verificaHouse(req.body.house);
+        const blood_status = verificaBloodStatus(req.body.blood_status);
       
         try {
           const result = await pool.query(
@@ -106,12 +110,12 @@ app.get("/wand", async (req, res) => {
 });
 
 app.post("/wand", async (req, res) => {
-    const { wood, core, length } = req.body;
+    const { date_of_creation, core, length } = req.body;
   
     try {
       const result = await pool.query(
-        'INSERT INTO wand (wood, core, length) VALUES ($1, $2, $3) RETURNING *',
-        [wood, core, length]
+        'INSERT INTO wand (length, core, date_of_creation) VALUES ($1, $2, $3) RETURNING *',
+        [length, core, date_of_creation]
       );
   
       res.status(201).json({
@@ -126,12 +130,12 @@ app.post("/wand", async (req, res) => {
 
 app.put("/wand/:id", async (req, res) => {
     const { id } = req.params;
-    const { wood, core, length } = req.body;
+    const { date_of_creation, core, length } = req.body;
   
     try {
       const result = await pool.query(
-        'UPDATE wand SET wood = $1, core = $2, length = $3 WHERE id = $4 RETURNING *',
-        [wood, core, length, id]
+        'UPDATE wand SET date_of_creation = $1, core = $2, length = $3 WHERE id = $4 RETURNING *',
+        [date_of_creation, core, length, id]
       );
   
       res.status(200).json({
@@ -175,7 +179,7 @@ app.get('/wizardmorewand', async (req, res) => {
       }
   
       res.status(200).send({
-        bruxo: rows[0],  
+        bruxo: rows,  
       });
     } catch (err) {
       console.error('Erro ao buscar bruxo e varinha:', err);
@@ -189,17 +193,17 @@ app.listen(PORT, () => {
 });
 
 const verificaHouse = (house) => {
-    if (house === "Grifinória" || house === "Sonserina" || house === "Corvinal" || house === "Lufa-Lufa") {
-        return true;
+    if (house === "Gryffindor" || house === "Slytherin" || house === "Ravenclaw" || house === "Hufflepuff") {
+        return house;
     } else {
-        return false;
+        return null;
     }
-  };
+};
 
 const verificaBloodStatus = (blood_status) => {
-    if (blood_status === "mestiço" || blood_status === "trouxa" || blood_status === "puro-sangue") {
-        return true;
+    if (blood_status === "Half-blood" || blood_status === "Muggle-born" || blood_status === "Pure-blood") {
+        return blood_status;
     } else {
-        return false;
+        return null;
     }
 };

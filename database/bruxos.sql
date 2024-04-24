@@ -15,5 +15,3 @@ INSERT INTO wizard (name, age, house, special_ability, blood_status, patronus, w
 SELECT * FROM wizard;
 
 SELECT w.*, b.* FROM wand w INNER JOIN wizard b ON w.id = b.wand_id;
-
--- faça if para as casas e para os tipos de sangue
