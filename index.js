@@ -114,8 +114,8 @@ app.post("/wand", async (req, res) => {
   
     try {
       const result = await pool.query(
-        'INSERT INTO wand (length, core, date_of_creation) VALUES ($1, $2, $3) RETURNING *',
-        [length, core, date_of_creation]
+        'INSERT INTO wand (date_of_creation, core, length) VALUES ($1, $2, $3) RETURNING *',
+        [date_of_creation, core, length]
       );
   
       res.status(201).json({
